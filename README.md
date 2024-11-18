@@ -1,2 +1,2 @@
 # my-react
-手写一个react
+仿写一个简易版react
