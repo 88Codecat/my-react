@@ -1,4 +1,3 @@
-// packages/shared/ReactTypes.ts
 export type Type = any;
 export type Key = any;
 export type Props = any;
