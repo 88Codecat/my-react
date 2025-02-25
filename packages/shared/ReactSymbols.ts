@@ -1,5 +1,4 @@
-// packages/shared/ReactSymbols.ts
-
+// 用于定义 React 元素的类型
 const supportSymbol = typeof Symbol === 'function' && Symbol.for;
 
 // 表示普通的 React 元素，即通过 JSX 创建的组件或 DOM 元素
