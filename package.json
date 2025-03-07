@@ -3,11 +3,13 @@
 	"version": "1.0.0",
 	"description": "",
 	"main": "index.js",
+	"type": "module",
 	"scripts": {
 		"lint": "eslint --ext .ts,.jsx,.tsx --fix --quiet ./packages",
-		"build-dev": "rimraf dist && rollup --config scripts/rollup/dev.config.js --bundleConfigAsCjs",
+		"build-dev": "rimraf dist && rollup --config scripts/rollup/react.config.js --bundleConfigAsCjs",
 		"demo": "vite serve demos/test-fc --config scripts/vite/vite.config.js --force",
 		"test": "jest --config scripts/jest/jest.config.js"
+		
 	},
 	"keywords": [],
 	"author": "",
@@ -47,6 +49,10 @@
 		"vite": "^5.1.4"
 	},
 	"dependencies": {
+		"react": "link:dist/node_modules/react",
 		"scheduler": "^0.23.0"
+	},
+	"pnpm": {
+		"overrides": {}
 	}
 }
