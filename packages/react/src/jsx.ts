@@ -20,10 +20,18 @@ const ReactElement = function (
 		key,
 		ref,
 		props,
-		__mark: 'erxiao'
+		__mark: 'W'
 	};
 	return element;
 };
+
+export function isValidElement(object: any): object is ReactElementType {
+	return (
+		typeof object === 'object' &&
+		object !== null &&
+		object.$$typeof === REACT_ELEMENT_TYPE
+	);
+}
 
 export const jsx = (type: ElementType, config: any, ...children: any) => {
 	let key: Key = null;
@@ -58,7 +66,7 @@ export const jsx = (type: ElementType, config: any, ...children: any) => {
 	return ReactElement(type, key, ref, props);
 };
 
-export const jsxDEV = (type: ElementType, config: any) => {
+export const jsxDEV = (type: ElementType, config: any, ...children: any) => {
 	let key: Key = null;
 	let ref: Ref = null;
 	const props: Props = {};
@@ -78,6 +86,14 @@ export const jsxDEV = (type: ElementType, config: any) => {
 		}
 		if ({}.hasOwnProperty.call(config, prop)) {
 			props[prop] = val;
+		}
+	}
+	const childrenLength = children.length;
+	if (childrenLength) {
+		if (childrenLength === 1) {
+			props.children = children[0];
+		} else {
+			props.children = children;
 		}
 	}
 	return ReactElement(type, key, ref, props);
