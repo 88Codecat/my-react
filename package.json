@@ -8,8 +8,7 @@
 		"build-dev": "rimraf dist && rollup --config scripts/rollup/dev.config.js --bundleConfigAsCjs",
 		"demo": "vite serve demos/test-fc --config scripts/vite/vite.config.js --force",
 		"test": "jest --config scripts/jest/jest.config.js"
-		
-	}, 
+	},
 	"keywords": [],
 	"author": "",
 	"license": "ISC",
@@ -46,12 +45,5 @@
 		"rollup-plugin-typescript2": "^0.36.0",
 		"typescript": "^5.2.2",
 		"vite": "^5.1.4"
-	},
-	"dependencies": {
-		"react": "link:dist/node_modules/react",
-		"scheduler": "^0.23.0"
-	},
-	"pnpm": {
-		"overrides": {}
 	}
 }
