@@ -1,6 +1,6 @@
 import React from 'react';
-import { useState } from 'react';
 import ReactDOM from 'react-dom/client';
+import App from './App';
 
 const jsx = (
 	<div>
@@ -8,11 +8,9 @@ const jsx = (
 	</div>
 );
 
-function App() {
-	const [count, setCount] = useState(120);
-	// window.setCount = setCount
-	return <span>{count}</span>;
+const elment = document.getElementById('root');
+if (elment) {
+	const root = ReactDOM.createRoot(elment);
+	// root.render(<App />);
+	root.render(jsx);
 }
-const root = ReactDOM.createRoot(document.getElementById('root')!);
-// root.render(jsx);
-root.render(<App />);
