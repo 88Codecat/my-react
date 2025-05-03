@@ -1,14 +1,15 @@
 import { FiberNode } from 'react-reconciler/src/fiber';
 import { HostComponent, HostText } from 'react-reconciler/src/workTags';
+import { updateFiberProps, DOMElement } from './SyntheticEvent';
 
 export type Container = Element;
 export type Instance = Element;
 export type TextInstance = Text;
 
 export const createInstance = (type: string, porps: any): Instance => {
-	// TODO: 处理 props
-	const element = document.createElement(type);
-	return element;
+	const element = document.createElement(type) as unknown;
+	updateFiberProps(element as DOMElement, porps);
+	return element as DOMElement;
 };
 
 export const appendInitialChild = (
@@ -33,16 +34,15 @@ export const appendChildToContainer = (
 export const commitUpdate = (fiber: FiberNode) => {
 	switch (fiber.tag) {
 		case HostComponent:
-			// TODO
-			break;
+			return updateFiberProps(fiber.stateNode, fiber.memoizedProps);
 		case HostText:
 			const text = fiber.memoizedProps.content;
-			commitTextUpdate(fiber.stateNode, text);
-			break;
+			return commitTextUpdate(fiber.stateNode, text);
 		default:
 			if (__DEV__) {
 				console.warn('未实现的 commitUpdate 类型', fiber);
 			}
+			break;
 	}
 };
 
