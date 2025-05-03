@@ -45,5 +45,15 @@
 		"rollup-plugin-typescript2": "^0.36.0",
 		"typescript": "^5.2.2",
 		"vite": "^5.1.4"
+	},
+	"pnpm": {
+		"overrides": {
+			"react": "link:dist/node_modules/react",
+			"react-dom": "link:dist/node_modules/react-dom"
+		}
+	},
+	"dependencies": {
+		"react": "link:dist/node_modules/react",
+		"react-dom": "link:dist/node_modules/react-dom"
 	}
 }
