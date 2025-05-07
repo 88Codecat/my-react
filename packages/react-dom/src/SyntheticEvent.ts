@@ -63,8 +63,6 @@ function dispatchEvent(container: Container, eventType: string, e: Event) {
 	}
 }
 
-
-
 function collectPaths(
 	targetElement: DOMElement,
 	container: Container,
