@@ -31,6 +31,19 @@ function ChildReconciler(shouldTrackSideEffects: boolean) {
 		return clone;
 	}
 
+	// 删除当前节点的所有兄弟节点
+	function deleteRemainingChildren(
+		returnFiber: FiberNode,
+		currentFirstChild: FiberNode | null
+	): void {
+		if (!shouldTrackSideEffects) return;
+		let childToDelete = currentFirstChild;
+		while (childToDelete !== null) {
+			deleteChild(returnFiber, childToDelete);
+			childToDelete = childToDelete.sibling;
+		}
+	}
+
 	// 处理单个 Fragment 节点的情况
 	// 对比 currentFiber 与 ReactElement，生成 workInProgress FiberNode
 	function reconcileSingleElement(
@@ -39,25 +52,29 @@ function ChildReconciler(shouldTrackSideEffects: boolean) {
 		element: ReactElementType
 	) {
 		// 组件的更新阶段
-		if (currentFiber !== null) {
+		while (currentFiber !== null) {
 			if (currentFiber.key === element.key) {
 				if (element.$$typeof === REACT_ELEMENT_TYPE) {
 					if (currentFiber.type === element.type) {
 						// key 和 type 都相同，复用旧的 Fiber 节点
 						const existing = useFiber(currentFiber, element.props);
 						existing.return = returnFiber;
+						// 剩下的兄弟节点标记删除
+						deleteRemainingChildren(returnFiber, currentFiber.sibling);
 						return existing;
 					}
-					// key 相同，但 type 不同，删除旧的 Fiber 节点
-					deleteChild(returnFiber, currentFiber);
+					// key 相同，但 type 不同，删除所有旧的 Fiber 节点
+					deleteRemainingChildren(returnFiber, currentFiber);
+					break;
 				} else {
 					if (__DEV__) {
 						console.warn('还未实现的 React 类型', element);
 					}
 				}
 			} else {
-				// key 不同，删除旧的 Fiber 节点
+				// key 不同，删除当前旧的 Fiber 节点，继续遍历兄弟节点
 				deleteChild(returnFiber, currentFiber);
+				currentFiber = currentFiber.sibling;
 			}
 		}
 		// 创建新的 Fiber 节点
@@ -73,16 +90,18 @@ function ChildReconciler(shouldTrackSideEffects: boolean) {
 		currentFiber: FiberNode | null,
 		content: string | number
 	) {
-		if (currentFiber !== null) {
+		while (currentFiber !== null) {
 			// 组件的更新阶段
 			if (currentFiber.tag === HostText) {
 				// 复用旧的 Fiber 节点
 				const existing = useFiber(currentFiber, { content });
 				existing.return = returnFiber;
+				deleteRemainingChildren(returnFiber, currentFiber.sibling);
 				return existing;
 			} else {
 				// 删除旧的 Fiber 节点
 				deleteChild(returnFiber, currentFiber);
+				currentFiber = currentFiber.sibling;
 			}
 		}
 		// 创建新的 Fiber 节点
