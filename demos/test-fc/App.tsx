@@ -1,11 +1,12 @@
-import React from 'react';
 import { useState } from 'react';
 
-function App() {
-	const [count, setCount] = useState(120);
-	// window.setCount = setCount
-	setCount(120);
-	return <span>{count}</span>;
-}
+const App = () => {
+	const [count, setCount] = useState(Number);
+	const handleClick = () => {
+		setCount(count + 1);
+	};
+	console.log(count);
+	return <button onClick={handleClick}>点击+1:{count}</button>;
+};
 
 export default App;
