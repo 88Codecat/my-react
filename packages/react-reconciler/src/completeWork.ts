@@ -9,7 +9,8 @@ import {
 	HostComponent,
 	HostRoot,
 	HostText,
-	FunctionComponent
+	FunctionComponent,
+	Fragment
 } from './workTags';
 import { NoFlags, Update } from './fiberFlags';
 
@@ -52,7 +53,9 @@ export const completeWork = (workInProgress: FiberNode) => {
 			// 收集更新 flags
 			bubbleProperties(workInProgress);
 			return null;
-
+		case Fragment:
+			bubbleProperties(workInProgress);
+			return null;
 		default:
 			if (__DEV__) {
 				console.warn('completeWork 未实现的类型', workInProgress);

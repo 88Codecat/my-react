@@ -1,3 +1,4 @@
+/* eslint-disable prefer-const */
 import {
 	Container,
 	Instance,
@@ -185,21 +186,17 @@ const commitDeletion = (childToDelete: FiberNode) => {
 	}
 
 	// 子树的根节点
-	let rootHostNode: FiberNode | null = null;
+	let rootChildrenToDelete: FiberNode[] = [];
 
 	// 递归遍历子树
 	commitNestedUnmounts(childToDelete, (unmountFiber) => {
 		switch (unmountFiber.tag) {
 			case HostComponent:
-				if (rootHostNode === null) {
-					rootHostNode = unmountFiber;
-				}
+				recordChildrenToDelete(rootChildrenToDelete, unmountFiber);
 				// TODO 解绑ref
 				return;
 			case HostText:
-				if (rootHostNode === null) {
-					rootHostNode = unmountFiber;
-				}
+				recordChildrenToDelete(rootChildrenToDelete, unmountFiber);
 				return;
 			case FunctionComponent:
 				//  TODO useEffect unmount
@@ -211,16 +208,36 @@ const commitDeletion = (childToDelete: FiberNode) => {
 		}
 	});
 
-	// 移除 rootHostNode 的DOM
-	if (rootHostNode !== null) {
+	// 移除 rootChildrenToDelete 的DOM
+	if (rootChildrenToDelete.length !== 0) {
 		// 找到待删除子树的根节点的 parent DOM
 		const hostParent = getHostParent(childToDelete) as Container;
-		removeChild((rootHostNode as FiberNode).stateNode, hostParent);
+		rootChildrenToDelete.forEach((node) => {
+			removeChild(node.stateNode, hostParent);
+		});
 	}
 
 	childToDelete.return = null;
 	childToDelete.child = null;
 };
+
+function recordChildrenToDelete(
+	childrenToDelete: FiberNode[],
+	unmountFiber: FiberNode
+) {
+	let lastOne = childrenToDelete[childrenToDelete.length - 1];
+	if (!lastOne) {
+		childrenToDelete.push(unmountFiber);
+	} else {
+		let node = lastOne.sibling;
+		while (node !== null) {
+			if (unmountFiber == node) {
+				childrenToDelete.push(unmountFiber);
+			}
+			node = node.sibling;
+		}
+	}
+}
 
 // 深度优先遍历 Fiber 树，执行 onCommitUnmount
 const commitNestedUnmounts = (

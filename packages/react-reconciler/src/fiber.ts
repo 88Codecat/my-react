@@ -1,11 +1,16 @@
 import { Props, Key, Ref, ReactElementType } from 'shared/ReactTypes';
-import { FunctionComponent, HostComponent, WorkTag } from './workTags';
+import {
+	FunctionComponent,
+	HostComponent,
+	Fragment,
+	WorkTag
+} from './workTags';
 import { NoFlags, Flags } from './fiberFlags';
 import { Container } from 'hostConfig';
 
 export class FiberNode {
 	tag: WorkTag;
-	key: Key;
+	key: Key | null;
 	stateNode: any;
 	type: any;
 	return: FiberNode | null;
@@ -23,30 +28,31 @@ export class FiberNode {
 	updateQueue: unknown;
 
 	constructor(tag: WorkTag, pendingProps: Props, key: Key) {
+		// 类型
 		this.tag = tag;
-		this.key = key;
+		this.key = key || null;
 		this.ref = null;
-		this.stateNode = null;
-		this.type = null;
+		this.stateNode = null; // 节点对应的实际 DOM 节点或组件实例
+		this.type = null; // 节点的类型，可以是原生 DOM 元素、函数组件或类组件等
 
-		this.return = null;
-		this.sibling = null;
-		this.child = null;
-		this.index = 0;
+		// 构成树状结构
+		this.return = null; // 指向节点的父节点
+		this.sibling = null; // 指向节点的下一个兄弟节点
+		this.child = null; // 指向节点的第一个子节点
+		this.index = 0; // 索引
 
-		this.pendingProps = pendingProps;
-		this.memoizedProps = null;
-		this.memoizedState = null;
-
-		this.alternate = null;
-		this.flags = NoFlags;
-		this.subtreeFlags = NoFlags;
+		// 作为工作单元
+		this.pendingProps = pendingProps; // 表示节点的新属性，用于在协调过程中进行更新
+		this.memoizedProps = null; // 已经更新完的属性
+		this.memoizedState = null; // 更新完成后新的 State
+		this.updateQueue = null; // 更新计划队列
+		this.alternate = null; // 指向节点的备份节点，用于在协调过程中进行比较
+		this.flags = NoFlags; // 表示节点的副作用类型，如更新、插入、删除等
+		this.subtreeFlags = NoFlags; // 表示子节点的副作用类型，如更新、插入、删除等
 		this.deletions = null; // 指向待删除的子节点，用于在协调过程中进行删除
-		this.updateQueue = null;
 	}
 }
 
-// packages/react-reconciler/src/fiber.ts
 export class FiberRootNode {
 	container: Container;
 	current: FiberNode;
@@ -61,6 +67,7 @@ export class FiberRootNode {
 	}
 }
 
+// 根据 FiberRootNode.current 创建 workInProgress
 export const createWorkInProgress = (
 	current: FiberNode,
 	pendingProps: Props
@@ -103,5 +110,10 @@ export function createFiberFromElement(element: ReactElementType): FiberNode {
 
 	const fiber = new FiberNode(fiberTag, props, key);
 	fiber.type = type;
+	return fiber;
+}
+
+export function createFiberFromFragment(elements: any[], key: Key): FiberNode {
+	const fiber = new FiberNode(Fragment, elements, key);
 	return fiber;
 }

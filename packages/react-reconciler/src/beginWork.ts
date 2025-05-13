@@ -5,7 +5,8 @@ import {
 	HostComponent,
 	HostRoot,
 	HostText,
-	FunctionComponent
+	FunctionComponent,
+	Fragment
 } from './workTags';
 import { reconcileChildFibers, mountChildFibers } from './childFiber';
 import { renderWithHooks } from './fiberHooks';
@@ -21,6 +22,8 @@ export const beginWork = (workInProgress: FiberNode) => {
 			return updateFunctionComponent(workInProgress);
 		case HostText:
 			return updateHostText();
+		case Fragment:
+			return updateFragment(workInProgress);
 		default:
 			if (__DEV__) {
 				console.warn('beginWork 未实现的类型', workInProgress.tag);
@@ -83,6 +86,11 @@ function reconcileChildren(
 
 function updateFunctionComponent(workInProgress: FiberNode) {
 	const nextChildren = renderWithHooks(workInProgress);
+	reconcileChildren(workInProgress, nextChildren);
+	return workInProgress.child;
+}
+function updateFragment(workInProgress: FiberNode) {
+	const nextChildren = workInProgress.pendingProps;
 	reconcileChildren(workInProgress, nextChildren);
 	return workInProgress.child;
 }
