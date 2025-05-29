@@ -40,17 +40,21 @@ export const insertChildToContainer = (
 };
 
 export const commitUpdate = (fiber: FiberNode) => {
+	if (__DEV__) {
+		console.log('执行 Update 操作', fiber);
+	}
 	switch (fiber.tag) {
 		case HostComponent:
-			return updateFiberProps(fiber.stateNode, fiber.memoizedProps);
+			// TODO
+			break;
 		case HostText:
 			const text = fiber.memoizedProps.content;
-			return commitTextUpdate(fiber.stateNode, text);
+			commitTextUpdate(fiber.stateNode, text);
+			break;
 		default:
 			if (__DEV__) {
 				console.warn('未实现的 commitUpdate 类型', fiber);
 			}
-			break;
 	}
 };
 

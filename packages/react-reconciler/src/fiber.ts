@@ -8,6 +8,7 @@ import {
 import { NoFlags, Flags } from './fiberFlags';
 import { Container } from 'hostConfig';
 import { Lane, Lanes, NoLane, NoLanes } from './fiberLanes';
+import { Effect } from './fiberHooks';
 
 export class FiberNode {
 	tag: WorkTag;
@@ -60,6 +61,7 @@ export class FiberRootNode {
 	finishedWork: FiberNode | null;
 	pendingLanes: Lanes;
 	finishedLane: Lane;
+	pendingPassiveEffects: PendingPassiveEffects;
 	constructor(container: Container, hostRootFiber: FiberNode) {
 		this.container = container;
 		this.current = hostRootFiber;
@@ -69,6 +71,11 @@ export class FiberRootNode {
 		this.finishedWork = null;
 		this.pendingLanes = NoLanes;
 		this.finishedLane = NoLane;
+
+		this.pendingPassiveEffects = {
+			unmount: [],
+			update: []
+		};
 	}
 }
 
@@ -108,6 +115,7 @@ export function createFiberFromElement(element: ReactElementType): FiberNode {
 	const { type, key, props } = element;
 	let fiberTag: WorkTag = FunctionComponent;
 	if (typeof type == 'string') {
+		// 如: <div/> 的 type: 'div'
 		fiberTag = HostComponent;
 	} else if (typeof type !== 'function' && __DEV__) {
 		console.warn('未定义的 type 类型', element);
@@ -121,4 +129,9 @@ export function createFiberFromElement(element: ReactElementType): FiberNode {
 export function createFiberFromFragment(elements: any[], key: Key): FiberNode {
 	const fiber = new FiberNode(Fragment, elements, key);
 	return fiber;
+}
+
+export interface PendingPassiveEffects {
+	unmount: Effect[];
+	update: Effect[];
 }

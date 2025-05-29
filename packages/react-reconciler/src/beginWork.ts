@@ -2,11 +2,11 @@ import { ReactElementType } from 'shared/ReactTypes';
 import { FiberNode } from './fiber';
 import { UpdateQueue, processUpdateQueue } from './updateQueue';
 import {
+	Fragment,
+	FunctionComponent,
 	HostComponent,
 	HostRoot,
-	HostText,
-	FunctionComponent,
-	Fragment
+	HostText
 } from './workTags';
 import { reconcileChildFibers, mountChildFibers } from './childFiber';
 import { renderWithHooks } from './fiberHooks';
@@ -59,9 +59,21 @@ function updateHostComponent(workInProgress: FiberNode) {
 	return workInProgress.child;
 }
 
+function updateFunctionComponent(workInProgress: FiberNode, renderLane: Lane) {
+	const nextChildren = renderWithHooks(workInProgress, renderLane);
+	reconcileChildren(workInProgress, nextChildren);
+	return workInProgress.child;
+}
+
 function updateHostText() {
 	// 没有子节点，直接返回 null
 	return null;
+}
+
+function updateFragment(workInProgress: FiberNode) {
+	const nextChildren = workInProgress.pendingProps;
+	reconcileChildren(workInProgress, nextChildren);
+	return workInProgress.child;
 }
 
 // 对比子节点的 current FiberNode 与 子节点的 ReactElement
@@ -83,16 +95,4 @@ function reconcileChildren(
 		// 首屏渲染阶段
 		workInProgress.child = mountChildFibers(workInProgress, null, children);
 	}
-}
-
-function updateFunctionComponent(workInProgress: FiberNode, renderLane: Lane) {
-	const nextChildren = renderWithHooks(workInProgress, renderLane);
-	reconcileChildren(workInProgress, nextChildren);
-	return workInProgress.child;
-}
-
-function updateFragment(workInProgress: FiberNode) {
-	const nextChildren = workInProgress.pendingProps;
-	reconcileChildren(workInProgress, nextChildren);
-	return workInProgress.child;
 }

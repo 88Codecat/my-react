@@ -67,17 +67,17 @@ export const processUpdateQueue = <State>(
 	};
 	if (pendingUpdate !== null) {
 		// 第一个 update
-		let first = pendingUpdate.next;
+		const first = pendingUpdate.next;
 		let pending = first as Update<any>;
 		do {
 			const updateLane = pending.lane;
 			if (updateLane == renderLane) {
 				const action = pending.action;
 				if (action instanceof Function) {
-					// action 是回调函数
+					// 若 action 是回调函数：(baseState = 1, update = (i) => 5i)) => memoizedState = 5
 					baseState = action(baseState);
 				} else {
-					// action 是状态值
+					// 若 action 是状态值：(baseState = 1, update = 2) => memoizedState = 2
 					baseState = action;
 				}
 			} else {

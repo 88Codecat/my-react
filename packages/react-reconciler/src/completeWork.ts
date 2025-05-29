@@ -6,13 +6,14 @@ import {
 } from 'hostConfig';
 import { FiberNode } from './fiber';
 import {
+	Fragment,
+	FunctionComponent,
 	HostComponent,
 	HostRoot,
-	HostText,
-	FunctionComponent,
-	Fragment
+	HostText
 } from './workTags';
 import { NoFlags, Update } from './fiberFlags';
+import { updateFiberProps } from 'react-dom/src/SyntheticEvent';
 
 // 生成更新计划，计算和收集更新 flags
 export const completeWork = (workInProgress: FiberNode) => {
@@ -21,12 +22,13 @@ export const completeWork = (workInProgress: FiberNode) => {
 	switch (workInProgress.tag) {
 		case HostRoot:
 		case FunctionComponent:
+		case Fragment:
 			bubbleProperties(workInProgress);
 			return null;
 
 		case HostComponent:
-			if (current !== null && workInProgress.stateNode) {
-				// TODO: 组件的更新阶段
+			if (current !== null && workInProgress.stateNode != null) {
+				// 组件的更新阶段
 				updateHostComponent(current, workInProgress);
 			} else {
 				// 首屏渲染阶段
@@ -41,8 +43,8 @@ export const completeWork = (workInProgress: FiberNode) => {
 			return null;
 
 		case HostText:
-			if (current !== null && workInProgress.stateNode) {
-				// TODO: 组件的更新阶段
+			if (current !== null && workInProgress.stateNode !== null) {
+				// 组件的更新阶段
 				updateHostText(current, workInProgress);
 			} else {
 				// 首屏渲染阶段
@@ -53,14 +55,12 @@ export const completeWork = (workInProgress: FiberNode) => {
 			// 收集更新 flags
 			bubbleProperties(workInProgress);
 			return null;
-		case Fragment:
-			bubbleProperties(workInProgress);
-			return null;
+
 		default:
 			if (__DEV__) {
 				console.warn('completeWork 未实现的类型', workInProgress);
 			}
-			return null;
+			break;
 	}
 };
 
@@ -73,7 +73,13 @@ function updateHostText(current: FiberNode, workInProgress: FiberNode) {
 }
 
 function updateHostComponent(current: FiberNode, workInProgress: FiberNode) {
-	markUpdate(workInProgress);
+	const oldProps = current.memoizedProps;
+	const newProps = workInProgress.pendingProps;
+
+	if (oldProps !== newProps) {
+		markUpdate(workInProgress);
+	}
+	updateFiberProps(workInProgress.stateNode, newProps);
 }
 
 // 为 Fiber 节点增加 Update flags
@@ -89,7 +95,7 @@ function appendAllChildren(parent: Container, workInProgress: FiberNode) {
 			appendInitialChild(parent, node.stateNode);
 		} else if (node.child !== null) {
 			// 递归处理其他类型的组件节点的子节点
-			node.child = node;
+			node.child.return = node;
 			node = node.child;
 			continue;
 		}
@@ -105,7 +111,7 @@ function appendAllChildren(parent: Container, workInProgress: FiberNode) {
 		}
 		// 处理下一个兄弟节点
 		node.sibling.return = node.return;
-		node.sibling = node;
+		node = node.sibling;
 	}
 }
 
@@ -121,5 +127,5 @@ function bubbleProperties(workInProgress: FiberNode) {
 		child = child.sibling;
 	}
 
-	workInProgress.subtreeFlags = subtreeFlags;
+	workInProgress.subtreeFlags |= subtreeFlags;
 }
