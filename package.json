@@ -54,6 +54,7 @@
 	},
 	"dependencies": {
 		"react": "link:dist/node_modules/react",
-		"react-dom": "link:dist/node_modules/react-dom"
+		"react-dom": "link:dist/node_modules/react-dom",
+		"scheduler": "^0.26.0"
 	}
 }

@@ -3,7 +3,6 @@ import { Props } from 'shared/ReactTypes';
 
 // 支持的事件类型
 const validEventTypeList = ['click'];
-export const elementPropsKey = '__props';
 
 type EventCallback = (e: Event) => void;
 
@@ -16,15 +15,17 @@ interface SyntheticEvent extends Event {
 	__stopPropagation: boolean;
 }
 
+export const elementPropsKey = '__props';
+
 export interface DOMElement extends Element {
 	[elementPropsKey]: Props;
 }
 
+// 将事件的回调保存在 DOM 中
 export function updateFiberProps(node: DOMElement, props: Props) {
 	node[elementPropsKey] = props;
 }
 
-// 初始化事件
 export function initEvent(container: Container, eventType: string) {
 	if (!validEventTypeList.includes(eventType)) {
 		console.warn('initEvent 未实现的事件类型', eventType);
@@ -54,10 +55,10 @@ function dispatchEvent(container: Container, eventType: string, e: Event) {
 	// 构造合成事件
 	const syntheticEvent = createSyntheticEvent(e);
 
-	// 遍历捕获 capture 事件
+	// 遍历捕获 capture
 	triggerEventFlow(capture, syntheticEvent);
 
-	// 遍历冒泡 bubble 事件
+	// 遍历冒泡 bubble
 	if (!syntheticEvent.__stopPropagation) {
 		triggerEventFlow(bubble, syntheticEvent);
 	}
