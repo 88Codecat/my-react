@@ -93,3 +93,4 @@ export const jsxDEV = (type: ElementType, config: any) => {
 };
 
 export const Fragment = REACT_FRAGMENT_TYPE;
+export const createElement = jsx;

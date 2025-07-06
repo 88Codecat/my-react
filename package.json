@@ -46,15 +46,7 @@
 		"typescript": "^5.2.2",
 		"vite": "^5.1.4"
 	},
-	"pnpm": {
-		"overrides": {
-			"react": "link:dist/node_modules/react",
-			"react-dom": "link:dist/node_modules/react-dom"
-		}
-	},
 	"dependencies": {
-		"react": "link:dist/node_modules/react",
-		"react-dom": "link:dist/node_modules/react-dom",
-		"scheduler": "^0.26.0"
+		"scheduler": "^0.23.0"
 	}
 }

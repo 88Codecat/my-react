@@ -22,23 +22,15 @@ export default defineConfig({
 				replacement: resolvePkgPath('react-noop-renderer')
 			},
 			{
-				find: 'react-reconciler',
-				replacement: resolvePkgPath('react-reconciler')
-			},
-			{
-				find: 'shared',
-				replacement: resolvePkgPath('shared')
-			},
-			{
 				find: 'hostConfig',
-				replacement: path.resolve(
-					resolvePkgPath('react-dom'),
-					'./src/hostConfig.ts'
-				)
 				// replacement: path.resolve(
-				// 	resolvePkgPath('react-reconciler'),
+				// 	resolvePkgPath('react-dom'),
 				// 	'./src/hostConfig.ts'
 				// )
+				replacement: path.resolve(
+					resolvePkgPath('react-noop-renderer'),
+					'./src/hostConfig.ts'
+				)
 			}
 		]
 	}

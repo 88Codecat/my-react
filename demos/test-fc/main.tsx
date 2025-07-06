@@ -1,14 +1,28 @@
 import React from 'react';
+import { useState } from 'react';
 import ReactDOM from 'react-dom/client';
-import App from './App';
 
 const jsx = (
 	<div>
-		<div>my-react</div>
+		<span>hello my-react</span>
 	</div>
 );
 
-const root = ReactDOM.createRoot(document.getElementById('root')!);
+function App() {
+	const [count, setCount] = useState(1210);
+	const arr =
+		count % 2 === 0
+			? [<li key="1">1</li>, <li key="2">2</li>, <li key="3">3</li>]
+			: [<li key="3">3</li>, <li key="2">2</li>, <li key="1">1</li>];
+	return <ul onClick={() => setCount(count + 1)}>{arr}</ul>;
+}
+
+function Child() {
+	return <span>222</span>;
+}
+
+const root = ReactDOM.createRoot(
+	document.getElementById('root') as HTMLElement
+);
+// root.render(jsx);
 root.render(<App />);
-// console.log('打印的<App />结果：', <App />);
-// console.log('打印的jsx结果:', jsx);
